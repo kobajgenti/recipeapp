@@ -24,7 +24,6 @@ private val retrofit = Retrofit.Builder()
 
 // Define the API service interface
 interface SpoonacularApiService {
-    // Existing search endpoint
     @GET("recipes/complexSearch")
     suspend fun searchRecipes(
         @Query("query") query: String,
@@ -32,14 +31,16 @@ interface SpoonacularApiService {
         @Query("diet") diet: String? = null,
         @Query("maxCalories") maxCalories: Int? = null,
         @Query("offset") offset: Int = 0,
-        @Query("number") number: Int = 10, // adjust number of results per page
+        @Query("number") number: Int = 10,
+        @Query("addRecipeInformation") addRecipeInformation: Boolean = true, // Add this
+        @Query("fillIngredients") fillIngredients: Boolean = true, // Add this
         @Query("apiKey") apiKey: String = "d85d90ecd7534967a75ee31a9df51317"
     ): RecipeResponse
 
-    // New endpoint for getting detailed recipe information
     @GET("recipes/{id}/information")
     suspend fun getRecipeById(
         @Path("id") id: String,
+        @Query("includeNutrition") includeNutrition: Boolean = false,
         @Query("apiKey") apiKey: String = "d85d90ecd7534967a75ee31a9df51317"
     ): Recipe
 }

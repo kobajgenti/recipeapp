@@ -11,11 +11,55 @@ data class Recipe(
     val title: String,
     val image: String,
     val instructions: String?,
-    val ingredients: List<Ingredient>?
-)
+    @Json(name = "extendedIngredients") val ingredients: List<Ingredient>?,
+    @Json(name = "analyzedInstructions") val analyzedInstructions: List<AnalyzedInstruction>? = null
+) {
+    fun getFormattedInstructions(): String {
+        // First try analyzed instructions
+        if (!analyzedInstructions.isNullOrEmpty()) {
+            return analyzedInstructions
+                .flatMap { it.steps }
+                .joinToString("\n\n") { "${it.number}. ${it.step}" }
+        }
+
+        // Fall back to regular instructions if available
+        return instructions?.let { htmlText ->
+            htmlText.replace("<ol>", "")
+                .replace("</ol>", "")
+                .replace("<li>", "\n• ")
+                .replace("</li>", "")
+                .trim()
+        } ?: "No instructions available"
+    }
+}
 
 data class Ingredient(
-    val name: String,
+    @Json(name = "originalName") val name: String,
     val amount: Double,
-    val unit: String
+    val unit: String,
+    @Json(name = "image") val image: String? = null
+)
+
+data class AnalyzedInstruction(
+    val name: String,
+    val steps: List<Step>
+)
+
+data class Step(
+    val number: Int,
+    val step: String,
+    val ingredients: List<StepIngredient>? = null,
+    val equipment: List<Equipment>? = null
+)
+
+data class StepIngredient(
+    val id: Int,
+    val name: String,
+    val image: String?
+)
+
+data class Equipment(
+    val id: Int,
+    val name: String,
+    val image: String?
 )

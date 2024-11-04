@@ -19,11 +19,15 @@ class RecipeRepository(private val apiService: SpoonacularApiService) {
         e.printStackTrace()
     }
 
-    // New function to get recipe details by ID
+    // Updated function to get recipe details by ID with better error handling
     suspend fun getRecipeById(id: String): Recipe? {
         return try {
-            apiService.getRecipeById(id)
+            val response = apiService.getRecipeById(id)
+            // Log the response to check if ingredients are present
+            println("Recipe details response: $response")
+            response
         } catch (e: Exception) {
+            println("Error fetching recipe details: ${e.message}")
             e.printStackTrace()
             null
         }
